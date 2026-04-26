@@ -1,25 +1,27 @@
 import Nav from "./components/Nav";
+import BouncingLogo from "./components/BouncingLogo";
 import Hero from "./components/Hero";
-import Services from "./components/Services";
 import About from "./components/About";
-import Offer from "./components/Offer";
+import Positioning from "./components/Positioning";
+import Coaching from "./components/Coaching";
+import HowItWorks from "./components/HowItWorks";
+import Location from "./components/Location";
 import BookingForm from "./components/BookingForm";
-import Testimonials from "./components/Testimonials";
-import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
 export default function Home() {
   return (
     <>
       <Nav />
+      <BouncingLogo />
       <main>
         <Hero />
-        <Services />
         <About />
-        <Offer />
+        <Positioning />
+        <Coaching />
+        <HowItWorks />
+        <Location />
         <BookingForm />
-        <Testimonials />
-        <Contact />
       </main>
       <Footer />
     </>

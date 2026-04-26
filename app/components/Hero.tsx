@@ -21,7 +21,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto w-full pt-24 pb-16">
+      <div className="relative z-10 max-w-5xl mx-auto w-full pt-24 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* ── LEFT: text content ── */}
@@ -37,15 +37,14 @@ export default function Hero() {
 
             {/* Headline */}
             <h1 className="animate-fade-up [animation-delay:200ms] text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white leading-[1.06]">
-              Private Tennis Coaching{" "}
-              <span className="text-green-500">That Actually</span> Improves
-              Your Game
+              Private Tennis Coaching That Builds{" "}
+              <span className="text-green-500">Real Confidence</span>
             </h1>
 
             {/* Subtext */}
             <p className="animate-fade-up [animation-delay:350ms] text-lg text-zinc-400 max-w-lg leading-relaxed">
-              Beginner &amp; entry-level programs for all ages 4+. Build
-              confidence, skills, and a lasting love for the game.
+              Beginner-friendly coaching for kids and adults. Learn the game
+              properly from the start, with clear structure and real progress.
             </p>
 
             {/* CTAs */}
@@ -54,7 +53,7 @@ export default function Hero() {
                 href="#contact"
                 className="group inline-flex items-center gap-2 bg-green-500 text-black font-semibold px-7 py-3.5 rounded-full hover:bg-green-400 active:scale-95 transition-all duration-200 text-base shadow-[0_0_40px_rgba(34,197,94,0.25)] hover:shadow-[0_0_60px_rgba(34,197,94,0.45)]"
               >
-                Book Your First Session
+                Contact Me
                 <svg
                   className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200"
                   fill="none"
@@ -70,10 +69,10 @@ export default function Hero() {
                 </svg>
               </a>
               <a
-                href="#services"
+                href="#coaching"
                 className="text-zinc-400 hover:text-white text-sm font-medium transition-colors underline-offset-4 hover:underline"
               >
-                See what&apos;s included
+                See coaching options
               </a>
             </div>
 
