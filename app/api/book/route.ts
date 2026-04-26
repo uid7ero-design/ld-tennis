@@ -1,11 +1,14 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { validateBookingRequest } from "@/app/lib/booking";
-import type { BookingRequest, BookingResponse } from "@/app/lib/booking";
+import type { BookingRequest } from "@/app/lib/booking";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const TO_EMAIL = process.env.RESEND_TO_EMAIL ?? "lukedoughtytennis@outlook.com";
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 function buildEmailHtml(data: BookingRequest): string {
   return `
@@ -20,44 +23,26 @@ function buildEmailHtml(data: BookingRequest): string {
       <div style="background: #111; padding: 32px; border-radius: 0 0 12px 12px; border: 1px solid #1f1f1f; border-top: none;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; width: 140px; vertical-align: top;">
-              Full Name
-            </td>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px; font-weight: 600;">
-              ${data.name}
-            </td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; width: 140px; vertical-align: top;">Full Name</td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px; font-weight: 600;">${data.name}</td>
           </tr>
           <tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">
-              Email
-            </td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">Email</td>
             <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px;">
               <a href="mailto:${data.email}" style="color: #22c55e; text-decoration: none;">${data.email}</a>
             </td>
           </tr>
           <tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">
-              Phone
-            </td>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px;">
-              ${data.phone || "Not provided"}
-            </td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">Phone</td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px;">${data.phone || "Not provided"}</td>
           </tr>
           <tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">
-              Preferred Time
-            </td>
-            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px;">
-              ${data.preferredTime}
-            </td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #71717a; font-size: 13px; vertical-align: top;">Preferred Time</td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #1f1f1f; color: #ededed; font-size: 14px;">${data.preferredTime}</td>
           </tr>
           <tr>
-            <td style="padding: 12px 0; color: #71717a; font-size: 13px; vertical-align: top;">
-              Message
-            </td>
-            <td style="padding: 12px 0; color: #ededed; font-size: 14px; line-height: 1.6;">
-              ${data.message || "No message provided"}
-            </td>
+            <td style="padding: 12px 0; color: #71717a; font-size: 13px; vertical-align: top;">Message</td>
+            <td style="padding: 12px 0; color: #ededed; font-size: 14px; line-height: 1.6;">${data.message || "No message provided"}</td>
           </tr>
         </table>
 
@@ -92,16 +77,16 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    replyTo: body.email,
-    subject: `New Booking Request — ${body.name}`,
-    html: buildEmailHtml(body),
-  });
-
-  if (error) {
-    console.error("[/api/book] Resend error:", error);
+  try {
+    await transporter.sendMail({
+      from: `"LD Tennis" <${process.env.GMAIL_USER}>`,
+      to: process.env.MAIL_TO ?? "lukedoughtytennis@outlook.com",
+      replyTo: body.email,
+      subject: `New Booking Request — ${body.name}`,
+      html: buildEmailHtml(body),
+    });
+  } catch (err) {
+    console.error("[/api/book] nodemailer error:", err);
     return Response.json(
       { success: false, message: "Failed to send booking request. Please try again." },
       { status: 500 }

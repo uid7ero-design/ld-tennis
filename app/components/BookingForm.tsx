@@ -67,7 +67,14 @@ export default function BookingForm() {
         body: JSON.stringify(form),
       });
 
-      const data: BookingResponse = await res.json();
+      let data: BookingResponse;
+      try {
+        data = await res.json();
+      } catch {
+        setState("error");
+        setErrorMessage(`Server error (${res.status}). Please try again.`);
+        return;
+      }
 
       if (data.success) {
         setState("success");
@@ -75,9 +82,10 @@ export default function BookingForm() {
         setState("error");
         setErrorMessage(data.message);
       }
-    } catch {
+    } catch (err) {
+      console.error("[BookingForm] fetch error:", err);
       setState("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage("Could not reach the server. Make sure the site is running and try again.");
     }
   }
 
