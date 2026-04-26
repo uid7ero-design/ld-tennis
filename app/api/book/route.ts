@@ -2,13 +2,29 @@ import nodemailer from "nodemailer";
 import { validateBookingRequest } from "@/app/lib/booking";
 import type { BookingRequest } from "@/app/lib/booking";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const isOutlook = process.env.SMTP_USER?.includes("outlook.com") ||
+                  process.env.SMTP_USER?.includes("hotmail.com") ||
+                  process.env.SMTP_USER?.includes("live.com");
+
+const transporter = nodemailer.createTransport(
+  isOutlook
+    ? {
+        host: "smtp-mail.outlook.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      }
+    : {
+        service: "gmail",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      }
+);
 
 function buildEmailHtml(data: BookingRequest): string {
   return `
@@ -79,7 +95,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     await transporter.sendMail({
-      from: `"LD Tennis" <${process.env.GMAIL_USER}>`,
+      from: `"LD Tennis" <${process.env.SMTP_USER}>`,
       to: process.env.MAIL_TO ?? "lukedoughtytennis@outlook.com",
       replyTo: body.email,
       subject: `New Booking Request — ${body.name}`,
