@@ -1,30 +1,8 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { validateBookingRequest } from "@/app/lib/booking";
 import type { BookingRequest } from "@/app/lib/booking";
 
-const isOutlook = process.env.SMTP_USER?.includes("outlook.com") ||
-                  process.env.SMTP_USER?.includes("hotmail.com") ||
-                  process.env.SMTP_USER?.includes("live.com");
-
-const transporter = nodemailer.createTransport(
-  isOutlook
-    ? {
-        host: "smtp-mail.outlook.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      }
-    : {
-        service: "gmail",
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      }
-);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function buildEmailHtml(data: BookingRequest): string {
   return `
@@ -93,16 +71,16 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  try {
-    await transporter.sendMail({
-      from: `"LD Tennis" <${process.env.SMTP_USER}>`,
-      to: process.env.MAIL_TO ?? "lukedoughtytennis@outlook.com",
-      replyTo: body.email,
-      subject: `New Booking Request — ${body.name}`,
-      html: buildEmailHtml(body),
-    });
-  } catch (err) {
-    console.error("[/api/book] nodemailer error:", err);
+  const { error } = await resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: process.env.MAIL_TO ?? "uid7ero@gmail.com",
+    replyTo: body.email,
+    subject: `New Booking Request — ${body.name}`,
+    html: buildEmailHtml(body),
+  });
+
+  if (error) {
+    console.error("[/api/book] Resend error:", error);
     return Response.json(
       { success: false, message: "Failed to send booking request. Please try again." },
       { status: 500 }
