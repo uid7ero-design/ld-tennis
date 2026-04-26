@@ -40,7 +40,7 @@ function Stars() {
 
 export default function Testimonials() {
   return (
-    <section className="py-28 px-6 bg-[#0d0d0d]">
+    <section className="py-32 px-6 bg-[#0a0a0a]">
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <ScrollFadeIn className="text-center mb-16">
